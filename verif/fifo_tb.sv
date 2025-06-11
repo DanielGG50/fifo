@@ -36,6 +36,7 @@ module fifo_tb;
 
     #20;
     rst_n = 1;
+
 		// writte until fifo is full
     for (int i = 0; i <= DEPTH + 1; i++) begin
       @(negedge clk);
@@ -50,7 +51,7 @@ module fifo_tb;
     if (!full) $error("FIFO should be full");
 
     // Read until fifo is empty
-    for (int i = 0; i <= DEPTH + 1; i++) begin
+    for (int i = 0; i < DEPTH; i++) begin
       @(negedge clk);
       rd_en = 1;
       wr_en = 0;
