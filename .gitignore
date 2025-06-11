@@ -10,4 +10,7 @@ superlint/jgproject/
 *.sw?
 .*.sw?
 
-jgproject/
+**/jgproject/
+**/shm_db/
+**/logs/
+.simvision/
