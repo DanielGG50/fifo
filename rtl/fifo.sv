@@ -1,6 +1,6 @@
 module fifo #(parameter WIDTH = 8, parameter DEPTH = 16) (
   input logic clk,
-  input logic rst_n,
+  input logic arst_n,
   input logic wr_en,
   input logic rd_en,
   input logic [WIDTH-1:0] data_in,
@@ -9,17 +9,16 @@ module fifo #(parameter WIDTH = 8, parameter DEPTH = 16) (
   output logic empty
 );
 
-  logic [WIDTH-1:0] fifo_mem [0:DEPTH-1];
-
-  logic [$clog2(DEPTH)-1:0] write_ptr; // Pointer for writing
-  logic [$clog2(DEPTH)-1:0] read_ptr;  // Pointer for reading
-  logic [$clog2(DEPTH):0] count;     // Number of elements in the FIFO
+  (* keep *) logic [WIDTH-1:0] fifo_mem [0:DEPTH-1];
+  (* keep *) logic [$clog2(DEPTH)-1:0] write_ptr;
+  (* keep *) logic [$clog2(DEPTH)-1:0] read_ptr;
+  (* keep *) logic [$clog2(DEPTH):0] count;
 
   assign full = (count == DEPTH);
   assign empty = (count == 0);
 
-  always_ff @(posedge clk or negedge rst_n) begin
-    if (!rst_n) begin
+  always_ff @(posedge clk or negedge arst_n) begin
+    if (!arst_n) begin
       write_ptr <= 0;
       read_ptr <= 0;
       count <= 0;

@@ -6,7 +6,7 @@ module fifo_tb;
   localparam DEPTH = 8;
 
   logic clk;
-  logic rst_n;
+  logic arst_n;
   logic wr_en;
   logic rd_en;
   logic [WIDTH-1:0] data_in;
@@ -16,7 +16,7 @@ module fifo_tb;
 
   fifo #(.WIDTH(WIDTH), .DEPTH(DEPTH)) dut (
     .clk(clk),
-    .rst_n(rst_n),
+    .arst_n(arst_n),
     .wr_en(wr_en),
     .rd_en(rd_en),
     .data_in(data_in),
@@ -29,13 +29,13 @@ module fifo_tb;
 
   initial begin
     clk = 0;
-    rst_n = 0;
+    arst_n = 0;
     wr_en = 0;
     rd_en = 0;
     data_in = 0;
 
     #20;
-    rst_n = 1;
+    arst_n = 1;
 
 		// writte until fifo is full
     for (int i = 0; i <= DEPTH + 1; i++) begin
