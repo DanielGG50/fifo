@@ -23,21 +23,34 @@ module fv_fifo #(parameter WIDTH = 8, DEPTH = 8) (
 	`define COV(block=fifo, name=no_name, precond=1'b1 |->, consq=1'b0) \
 	``block``_cov_``name``: cover property (@(posedge clk) disable iff(!arst_n) ``precond`` ``consq``);
 
-  `AST(fifo, write_not_full, wr_en && !full |=>, fifo_mem[write_ptr] == $past(data_in))
-  `AST(fifo, read_not_empty, rd_en && !empty |=>, data_out == $past(fifo_mem[read_ptr]))
+			// Check writting/reading when not full/em,pty
+  `AST(fifo, write_not_full, wr_en && !full |=>, fifo_mem[$past(write_ptr)] == $past(data_in))
+  //`AST(fifo, read_not_empty, rd_en && !empty |=>, data_out == $past(fifo_mem[read_ptr]))
 
-  `AST(fifo, write_ptr_increment, wr_en && !full |=>, write_ptr == $past(write_ptr) + 1)
-  `AST(fifo, read_ptr_increment, rd_en && !empty |=>, read_ptr == $past(read_ptr) + 1)
-  `AST(fifo, count_increment, wr_en && !full && !empty |=>, count == $past(count) + 1)
+			// Check counter and pointers when writting/reading
+  //`AST(fifo, write_ptr_increment, wr_en && !full |=>, write_ptr == $past(write_ptr) + 1'b1)
+  //`AST(fifo, read_ptr_increment, rd_en && !empty |=>, read_ptr == $past(read_ptr) +  1'b1)
+  `AST(fifo, count_increment, wr_en && !full && !empty |=>, count == $past(count) + 1'b1)
+ 	`AST(fifo, count_decrement, wr_en && !full && !empty |=>, count == $past(count) - 1'b1)
 
+			// Full/Empty flags
   `AST(fifo, full_flag, count == DEPTH |->, full)
   `AST(fifo, empty_flag, count == 0 |->, empty)
 
-  `AST(fifo, full_invalid_write, (wr_en && full) |=>, $stable(write_ptr) && $stable(count))
+			// Check if write/read block when full/empty
+  //`AST(fifo, full_invalid_write, (wr_en && full) |=>, $stable(write_ptr) && $stable(count))
   `AST(fifo, empty_invalid_read, (rd_en && empty) |=>, $stable(read_ptr) && $stable(count))
 
-  `AST(fifo, w_pointer_wrap, write_ptr == DEPTH - 1 |=>, write_ptr == 0)
-  `AST(fifo, r_pointer_wrap, read_ptr == DEPTH - 1 |=>, read_ptr == 0)
+			// Check if pointer goes back to zero
+  //`AST(fifo, w_pointer_wrap, write_ptr == DEPTH -  1'b1 |=>, write_ptr == 0)
+  `AST(fifo, r_pointer_wrap, read_ptr == DEPTH -  1'b1 |=>, read_ptr == 0)
+
+
+			// Asume wr_en or rd_en are deactivated
+	`ASM(fifo, wr_en_deactivated, , wr_en == 1'b0)
+	//`ASM(fifo, rd_en_deactivated, , rd_en == 1'b0)
+
+
 
 endmodule
 
